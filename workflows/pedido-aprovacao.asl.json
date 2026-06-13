@@ -1,0 +1,41 @@
+﻿{
+  "Comment": "Workflow simples de aprovação de pedido usando AWS Step Functions",
+  "StartAt": "ReceberPedido",
+  "States": {
+    "ReceberPedido": {
+      "Type": "Pass",
+      "Next": "ValidarValor"
+    },
+    "ValidarValor": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.valor",
+          "NumericLessThanEquals": 500,
+          "Next": "AprovarPedido"
+        },
+        {
+          "Variable": "$.valor",
+          "NumericGreaterThan": 500,
+          "Next": "EnviarParaAnalise"
+        }
+      ],
+      "Default": "FalhaValidacao"
+    },
+    "AprovarPedido": {
+      "Type": "Succeed"
+    },
+    "EnviarParaAnalise": {
+      "Type": "Pass",
+      "Next": "FinalizarAnalise"
+    },
+    "FinalizarAnalise": {
+      "Type": "Succeed"
+    },
+    "FalhaValidacao": {
+      "Type": "Fail",
+      "Error": "ValorInvalido",
+      "Cause": "O valor do pedido não pôde ser validado."
+    }
+  }
+}

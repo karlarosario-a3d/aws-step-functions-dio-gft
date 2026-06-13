@@ -1,0 +1,16 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# AWS / Credenciais
+.aws/
+*.pem
+*.key
+.env
+
+# Logs
+*.log
