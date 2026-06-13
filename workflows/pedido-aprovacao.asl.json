@@ -10,13 +10,29 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.valor",
-          "NumericLessThanEquals": 500,
+          "And": [
+            {
+              "Variable": "$.valor",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.valor",
+              "NumericLessThanEquals": 500
+            }
+          ],
           "Next": "AprovarPedido"
         },
         {
-          "Variable": "$.valor",
-          "NumericGreaterThan": 500,
+          "And": [
+            {
+              "Variable": "$.valor",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.valor",
+              "NumericGreaterThan": 500
+            }
+          ],
           "Next": "EnviarParaAnalise"
         }
       ],
@@ -35,7 +51,7 @@
     "FalhaValidacao": {
       "Type": "Fail",
       "Error": "ValorInvalido",
-      "Cause": "O valor do pedido não pôde ser validado."
+      "Cause": "O valor do pedido não foi informado ou não pôde ser validado."
     }
   }
 }

@@ -1,81 +1,127 @@
 # AWS Step Functions - Workflow Automatizado
 
-## Descrição
+## Sobre o Projeto
 
-Este projeto foi desenvolvido como parte do desafio do bootcamp da DIO em parceria com a GFT e AWS. O objetivo foi consolidar os conhecimentos adquiridos sobre AWS Step Functions, documentando conceitos, aprendizados e a estrutura de um workflow automatizado.
+Este projeto foi desenvolvido como parte do desafio do bootcamp da DIO em parceria com a GFT e AWS.
 
-O projeto apresenta um exemplo de fluxo de aprovação de pedido utilizando uma máquina de estados, com etapas de validação, decisão e finalização do processo.
+O objetivo do laboratório é consolidar os conhecimentos sobre **AWS Step Functions**, documentando a criação, execução e validação de um workflow automatizado baseado em uma regra de negócio simples.
 
-## Objetivos do Projeto
+Para isso, foi criado um fluxo de aprovação de pedidos utilizando uma **máquina de estados**, com etapas de recebimento, validação, decisão, aprovação, análise manual e tratamento de falha.
+
+---
+
+## Objetivos
 
 * Compreender o funcionamento do AWS Step Functions.
-* Entender o conceito de máquinas de estado.
-* Documentar a criação de um workflow automatizado.
-* Praticar a organização de documentação técnica em um repositório GitHub.
-* Registrar aprendizados e possíveis melhorias futuras.
+* Criar e documentar uma máquina de estados.
+* Aplicar lógica condicional utilizando o estado `Choice`.
+* Executar diferentes cenários de teste com entradas JSON.
+* Registrar evidências visuais da execução do workflow.
+* Organizar o projeto no GitHub como documentação técnica.
+
+---
 
 ## O que é AWS Step Functions?
 
-O AWS Step Functions é um serviço de orquestração serverless que permite criar fluxos de trabalho automatizados. Ele ajuda a coordenar diferentes etapas de um processo, permitindo representar visualmente a execução de tarefas, decisões, tratamentos de erro e finalizações.
+O **AWS Step Functions** é um serviço serverless de orquestração que permite criar fluxos de trabalho automatizados.
 
-Os workflows são definidos como máquinas de estado, onde cada etapa representa uma ação ou decisão dentro do processo.
+Esses fluxos são chamados de **state machines** e são compostos por diferentes estados, responsáveis por representar etapas, decisões, sucessos, falhas e integrações com outros serviços da AWS.
 
-## Conceitos Aprendidos
+No contexto deste laboratório, o Step Functions foi utilizado para representar um processo simples de aprovação de pedidos, permitindo visualizar o caminho percorrido por cada execução.
 
-Durante o laboratório, foram revisados os seguintes conceitos:
+---
 
-* State Machine
-* Amazon States Language
-* Estados do tipo Pass
-* Estados do tipo Choice
-* Estados de sucesso e falha
-* Execução visual de workflows
-* Organização de documentação técnica
-* Uso do GitHub para entrega de projetos
+## Cenário Simulado
+
+O cenário escolhido para este laboratório foi um **workflow de aprovação de pedidos**.
+
+A regra de negócio utilizada foi:
+
+* Pedidos com valor menor ou igual a `500` são aprovados automaticamente.
+* Pedidos com valor maior que `500` são enviados para análise manual.
+* Pedidos sem o campo `valor` são tratados como inválidos.
+
+Esse cenário foi escolhido por permitir a prática de decisões condicionais dentro de um workflow, usando o estado `Choice`.
+
+---
 
 ## Arquitetura do Workflow
 
-O exemplo escolhido foi um fluxo de aprovação de pedido.
+Fluxo simplificado do processo:
 
-Fluxo proposto:
+```mermaid
+flowchart TD
+    A[Receber Pedido] --> B[Validar Valor]
+    B --> C{Valor informado?}
+    C -->|Não| H[Falha de Validação]
+    C -->|Sim| D{Valor <= 500?}
+    D -->|Sim| E[Aprovar Pedido]
+    D -->|Não| F[Enviar para Análise Manual]
+    F --> G[Finalizar Análise]
+    E --> I[Finalizar com Sucesso]
+    G --> I
+```
 
-1. O workflow recebe os dados de um pedido.
-2. O valor do pedido é validado.
-3. Se o valor for menor ou igual a 500, o pedido é aprovado automaticamente.
-4. Se o valor for maior que 500, o pedido segue para análise manual.
-5. O processo é finalizado com sucesso.
+---
 
-Representação simplificada:
+## Estados Utilizados
+
+| Estado              | Tipo      | Função                                                     |
+| ------------------- | --------- | ---------------------------------------------------------- |
+| `ReceberPedido`     | `Pass`    | Recebe os dados iniciais do pedido                         |
+| `ValidarValor`      | `Choice`  | Avalia se o pedido possui valor e define o próximo caminho |
+| `AprovarPedido`     | `Succeed` | Finaliza o workflow com aprovação automática               |
+| `EnviarParaAnalise` | `Pass`    | Simula o envio do pedido para análise manual               |
+| `FinalizarAnalise`  | `Succeed` | Finaliza o fluxo após a análise manual                     |
+| `FalhaValidacao`    | `Fail`    | Finaliza o workflow com erro quando o pedido é inválido    |
+
+---
+
+## Estrutura do Repositório
 
 ```text
-Receber pedido
-     ↓
-Validar valor
-     ↓
-Pedido <= 500?
-   /        \
-Sim        Não
- |          |
-Aprovar    Análise manual
- |          |
-Finalizar processo
+aws-step-functions-dio-gft/
+│
+├── docs/
+│   ├── anotacoes.md
+│   ├── aprendizados.md
+│   ├── arquitetura.md
+│   ├── cenarios-de-teste.md
+│   └── roteiro-execucao.md
+│
+├── images/
+│   ├── execucao-aprovada.png
+│   ├── execucao-analise-manual.png
+│   └── execucao-falha-validacao.png
+│
+├── inputs/
+│   ├── pedido-aprovado.json
+│   ├── pedido-analise-manual.json
+│   └── pedido-invalido.json
+│
+├── workflows/
+│   └── pedido-aprovacao.asl.json
+│
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
-## Exemplo de entrada
+---
+
+## Definição da Máquina de Estados
+
+A definição completa da máquina de estados está disponível no arquivo:
+
+```text
+workflows/pedido-aprovacao.asl.json
+```
+
+Abaixo está a estrutura utilizada no laboratório:
 
 ```json
 {
-  "pedidoId": "PED-001",
-  "cliente": "Cliente Exemplo",
-  "valor": 350
-}
-```
-
-## Exemplo de definição da máquina de estados
-
-```json
-{
-  "Comment": "Workflow simples de aprovação de pedido",
+  "Comment": "Workflow simples de aprovação de pedido usando AWS Step Functions",
   "StartAt": "ReceberPedido",
   "States": {
     "ReceberPedido": {
@@ -86,13 +132,29 @@ Finalizar processo
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.valor",
-          "NumericLessThanEquals": 500,
+          "And": [
+            {
+              "Variable": "$.valor",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.valor",
+              "NumericLessThanEquals": 500
+            }
+          ],
           "Next": "AprovarPedido"
         },
         {
-          "Variable": "$.valor",
-          "NumericGreaterThan": 500,
+          "And": [
+            {
+              "Variable": "$.valor",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.valor",
+              "NumericGreaterThan": 500
+            }
+          ],
           "Next": "EnviarParaAnalise"
         }
       ],
@@ -111,39 +173,154 @@ Finalizar processo
     "FalhaValidacao": {
       "Type": "Fail",
       "Error": "ValorInvalido",
-      "Cause": "O valor do pedido não pôde ser validado."
+      "Cause": "O valor do pedido não foi informado ou não pôde ser validado."
     }
   }
 }
 ```
 
-## Prints da Execução
+---
 
-As capturas de tela da execução do workflow podem ser encontradas na pasta `/images`.
+## Cenários de Teste
 
-Sugestão de imagens:
+A máquina de estados foi executada com três entradas diferentes para validar os caminhos possíveis do workflow.
 
-* Criação da máquina de estados no Workflow Studio.
-* Execução com valor aprovado automaticamente.
-* Execução com valor enviado para análise.
-* Histórico da execução.
+| Cenário                            | Arquivo de entrada                  | Resultado esperado                                                        |
+| ---------------------------------- | ----------------------------------- | ------------------------------------------------------------------------- |
+| Pedido aprovado automaticamente    | `inputs/pedido-aprovado.json`       | Execução finalizada em `AprovarPedido`                                    |
+| Pedido enviado para análise manual | `inputs/pedido-analise-manual.json` | Execução passou por `EnviarParaAnalise` e finalizou em `FinalizarAnalise` |
+| Pedido inválido                    | `inputs/pedido-invalido.json`       | Execução finalizada em `FalhaValidacao`                                   |
+
+---
+
+## Exemplos de Entrada
+
+### Pedido aprovado automaticamente
+
+```json
+{
+  "pedidoId": "PED-001",
+  "cliente": "Cliente Exemplo",
+  "valor": 350
+}
+```
+
+Resultado esperado:
+
+```text
+ReceberPedido -> ValidarValor -> AprovarPedido
+```
+
+---
+
+### Pedido enviado para análise manual
+
+```json
+{
+  "pedidoId": "PED-002",
+  "cliente": "Cliente Corporativo",
+  "valor": 1200
+}
+```
+
+Resultado esperado:
+
+```text
+ReceberPedido -> ValidarValor -> EnviarParaAnalise -> FinalizarAnalise
+```
+
+---
+
+### Pedido inválido
+
+```json
+{
+  "pedidoId": "PED-003",
+  "cliente": "Cliente Teste"
+}
+```
+
+Resultado esperado:
+
+```text
+ReceberPedido -> ValidarValor -> FalhaValidacao
+```
+
+---
+
+## Evidências do Laboratório
+
+As execuções foram realizadas no AWS Step Functions, utilizando a máquina de estados criada para este laboratório.
+
+### Execução com pedido aprovado automaticamente
+
+![Execução aprovada](images/execucao-aprovada.png)
+
+### Execução com pedido enviado para análise manual
+
+![Execução análise manual](images/execucao-analise-manual.png)
+
+### Execução com falha de validação
+
+![Execução falha validação](images/execucao-falha-validacao.png)
+
+As demais capturas de tela utilizadas durante a prática estão disponíveis na pasta:
+
+```text
+images/
+```
+
+---
+
+## Como Executar o Laboratório
+
+Para reproduzir este laboratório:
+
+1. Acesse o Console da AWS.
+2. Pesquise pelo serviço **Step Functions**.
+3. Crie uma nova **State Machine**.
+4. Escolha a opção de criação por código.
+5. Copie a definição do arquivo `workflows/pedido-aprovacao.asl.json`.
+6. Crie a máquina de estados.
+7. Inicie execuções utilizando os arquivos da pasta `inputs`.
+8. Valide o caminho percorrido por cada execução.
+9. Registre as evidências visuais na pasta `images`.
+
+---
 
 ## Aprendizados
 
-Durante a prática, foi possível entender como o AWS Step Functions facilita a orquestração de processos automatizados. A visualização do fluxo ajuda a compreender cada etapa da execução, tornando o processo mais rastreável e organizado.
+Durante este laboratório, foi possível entender de forma prática como o AWS Step Functions facilita a criação de workflows automatizados e visuais.
 
-Também foi possível perceber a importância de documentar tecnicamente cada decisão tomada durante o laboratório, pois isso facilita futuras consultas, revisões e implementações em cenários reais.
+A prática ajudou a compreender melhor:
+
+* Como uma máquina de estados é estruturada.
+* Como o input JSON percorre o workflow.
+* Como utilizar o estado `Choice` para criar decisões condicionais.
+* Como representar fluxos de sucesso e falha.
+* Como documentar um processo técnico de forma clara no GitHub.
+
+Além disso, o laboratório reforçou a importância da documentação técnica como parte do processo de aprendizado e da construção de portfólio.
+
+---
 
 ## Possíveis Melhorias Futuras
 
+Este projeto pode ser evoluído com novas integrações e melhorias, como:
+
 * Integrar o workflow com uma função AWS Lambda.
-* Adicionar envio de notificações com Amazon SNS.
-* Registrar os pedidos em uma tabela Amazon DynamoDB.
-* Criar tratamento de erros mais detalhado.
-* Automatizar o deploy com AWS SAM ou Terraform.
+* Enviar notificações com Amazon SNS.
+* Registrar pedidos em uma tabela Amazon DynamoDB.
+* Adicionar tratamento de erros mais detalhado.
+* Criar logs e métricas de execução.
+* Automatizar a infraestrutura com AWS SAM, Serverless Framework ou Terraform.
+
+---
 
 ## Conclusão
 
-Este desafio ajudou a consolidar os conceitos fundamentais de AWS Step Functions e mostrou como workflows automatizados podem ser utilizados para organizar processos de negócio de forma visual, escalável e documentada.
+Este desafio permitiu consolidar os principais conceitos sobre AWS Step Functions por meio de um laboratório simples, prático e documentado.
 
-A prática também reforçou a importância do GitHub como ferramenta de documentação e compartilhamento de conhecimento técnico.
+A criação do workflow de aprovação de pedidos demonstrou como processos de negócio podem ser representados por máquinas de estado, facilitando a visualização, rastreabilidade e organização das etapas.
+
+O projeto também reforçou o uso do GitHub como ferramenta para documentação técnica, versionamento e compartilhamento de conhecimento.
